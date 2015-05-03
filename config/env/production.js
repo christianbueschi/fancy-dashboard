@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	db: process.env.MONGO_URI,
+	db: process.env.MONGO_URL,
 	assets: {
 		lib: {
 			css: [
