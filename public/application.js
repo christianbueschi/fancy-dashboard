@@ -4,18 +4,15 @@
 angular.module(ApplicationConfiguration.applicationModuleName, ApplicationConfiguration.applicationModuleVendorDependencies);
 
 // Setting HTML5 Location Mode
-angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider',
-	function($locationProvider) {
+angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider', 'SpotifyProvider',
+	function($locationProvider, SpotifyProvider) {
 		$locationProvider.hashPrefix('!');
-	}
-]);
 
-// Setting Angular Material and Theme
-angular.module(ApplicationConfiguration.applicationModuleName).config(['$mdThemingProvider',
-	function($mdThemingProvider) {
-		$mdThemingProvider.theme('default')
-			.primaryPalette('green')
-			.accentPalette('lime')
+		SpotifyProvider.setClientId('7cb9a23e173e4c54987f4d90dd777509');
+		SpotifyProvider.setRedirectUri('http://localhost:3000/#!/spotify');
+		SpotifyProvider.setScope('user-read-private playlist-read-private playlist-modify-private playlist-modify-public');
+		// If you already have an auth token
+		//SpotifyProvider.setAuthToken('zoasliu1248sdfuiknuha7882iu4rnuwehifskmkiuwhjg23');
 	}
 ]);
 

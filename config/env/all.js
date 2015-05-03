@@ -20,12 +20,11 @@ module.exports = {
 				'public/lib/angular-resource/angular-resource.js', 
 				'public/lib/angular-cookies/angular-cookies.js', 
 				'public/lib/angular-animate/angular-animate.js', 
-				'public/lib/angular-touch/angular-touch.js', 
+				'public/lib/angular-touch/angular-touch.js',
+				'public/lib/angular-spotify/src/angular-spotify.js',
 				'public/lib/angular-sanitize/angular-sanitize.js', 
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
-				'public/lib/angular-ui-utils/ui-utils.js',
-				'public/lib/angular-aria/angular-aria.min.js',
-				'public/lib/angular-material/angular-material.min.js'
+				'public/lib/angular-ui-utils/ui-utils.js'
 			]
 		},
 		css: [

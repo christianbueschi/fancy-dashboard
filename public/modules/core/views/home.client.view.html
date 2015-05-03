@@ -1,0 +1,52 @@
+<section data-ng-controller="HomeController	as ctrl">
+
+	<div class="box transport" data-ng-init="ctrl.getTransportConnection()">
+		<h2 class="title">Dr Bus fahrt</h2>
+		<h3 class="value">{{ctrl.transport1 | date:'HH:mm'}}</h3>
+		<h3 class="value">{{ctrl.transport2 | date:'HH:mm'}}</h3>
+	</div>
+
+	<div class="box weather" data-ng-init="ctrl.getWeatherForecast()">
+		<ul>
+			<li data-ng-repeat="forecast in ctrl.weather track by $index">
+				<h2 data-ng-if="$index==0" class="title">Ds Wätter hüt</h2>
+				<h2 data-ng-if="$index==1" class="title">morn</h2>
+				<h3 class="value">{{forecast.w_txt}}</h3>
+				zwüsche <h3 class="degree">{{forecast.tn}}&deg;</h3>
+				u <h3 class="degree">{{forecast.tx}}&deg;</h3>
+			</li>
+		</ul>
+		<img ng-src="modules/core/img/weather/{{ctrl.weather_code}}.gif" alt=""/>
+	</div>
+
+	<div class="box spotify">
+		<h2 class="title">Muusig</h2>
+		<button data-ng-click="ctrl.getList()">Connect</button>
+		<ul>
+			<li data-ng-repeat="track in ctrl.tracks">
+				<a href="{{track.external_urls.spotify}}" target="_blank">{{track.name}}</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="box shopping" data-ng-init="ctrl.getAllItems()">
+		<h2 class="title">Iichoufslischte</h2>
+		<form data-ng-submit="ctrl.submit(ctrl.title)">
+			<input type="text" placeholder="Chouf das..	" data-ng-model="ctrl.title"/>
+			<input type="submit" value="+" class="submit"/>
+		</form>
+		<ul>
+			<li data-ng-repeat="item in ctrl.items | orderBy : '-!isBought' track by $index">
+				<div class="checkbox">
+					<input type="checkbox" data-ng-model="item.isBought" id="id-{{$index}}" data-ng-change="ctrl.bought(item)"/>
+					<label class="" for="id-{{$index}}"></label>
+				</div>
+				<span class="item">{{item.title}}</span>
+				<button data-ng-click="ctrl.remove(item)">x</button>
+			</li>
+		</ul>
+	</div>
+
+</section>
+
+

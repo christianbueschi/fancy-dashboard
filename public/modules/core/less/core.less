@@ -1,15 +1,157 @@
-.content {
-	margin-top: 50px;
+
+@c-orange: #79BD8F;
+@c-green1: #BEEB9F;
+@c-yellow: #FFFF9D;
+@c-green2: #79BD8F;
+@c-green3: #00A388;
+@spacing: 40px;
+
+h1,
+h2,
+h3 {
+	font-weight: normal;
 }
-.undecorated-link:hover {
+
+a {
+	color: white;
 	text-decoration: none;
+	&:hover {
+		color: @c-green1;
+	}
 }
-[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-	display: none !important;
+
+button {
+	background-color: white;
+	border: none;
+	color: @c-orange;
+	&:hover {
+		background-color: @c-green3;
+		color: white;
+	}
+	&.submit {
+		margin: @spacing/2 0;
+		padding: @spacing/2;
+	}
 }
-.ng-invalid.ng-dirty {
-	border-color: #FA787E;
+
+.box {
+	color: white;
+	padding: @spacing/2 @spacing @spacing;
+	float: left;
+	margin-right: @spacing/2;
+	background-color: @c-orange;
+
+	&.c-orange {
+		background-color: @c-orange;
+	}
+	&.c-green1 {
+		background-color: @c-green1;
+	}
+	&.c-green2 {
+		background-color: @c-green2;
+	}
+	&.c-green3 {
+		background-color: @c-green3;
+	}
+	&.c-yellow {
+		background-color: @c-yellow;
+	}
 }
-.ng-valid.ng-dirty {
-	border-color: #78FA89;
+
+.title {
+	font-size: 18px;
+	margin: 0;
+}
+
+.value {
+	font-size: 50px;
+	margin: 0;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+li {
+	list-style: none;
+	&:nth-child(2) {
+		.title {
+			margin-top: @spacing;
+		}
+	}
+}
+
+form {
+	margin: @spacing/2 0;
+}
+
+input {
+	padding: @spacing/2;
+	border: none;
+	background-color: white;
+}
+
+.weather {
+	img {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		z-index: -1;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
+
+	.degree {
+		display: inline;
+		font-size: 60px;
+	}
+}
+
+.shopping {
+	li {
+		position: relative;
+		height: 50px;
+		line-height: 2.4;
+	}
+	.item {
+		padding-left: 50px;
+	}
+	input[type="checkbox"] {
+		visibility: hidden;
+	}
+	label {
+		position: absolute;
+		width: 50px;
+		height: 50px;
+		left: 0;
+		top: 0;
+	}
+	input[type=checkbox]:checked + label {
+		position: absolute;
+		width: 11px;
+		height: 20px;
+		border: 2px solid @c-orange;
+		left: 0;
+		top: 0;
+		transform: rotate(45deg);
+		border-top: none;
+		border-left: 0;
+		top: 7px;
+		left: 13px;
+	}
+}
+
+.checkbox {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	background-color: white;
+
+}
+.label-checkbox {
+
 }
