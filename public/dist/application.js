@@ -4,7 +4,8 @@
 var ApplicationConfiguration = (function() {
 	// Init module configuration options
 	var applicationModuleName = 'meanjs';
-	var applicationModuleVendorDependencies = ['ngResource', 'ngCookies',  'ngAnimate',  'ngTouch',  'ngSanitize',  'ui.router', 'ui.utils', 'ngMaterial'];
+	var applicationModuleVendorDependencies = ['ngResource', 'ngCookies',  'ngAnimate',
+		'ngTouch',  'ngSanitize',  'ui.router', 'ui.utils', 'spotify'];
 
 	// Add a new vertical module
 	var registerModule = function(moduleName, dependencies) {
@@ -27,18 +28,15 @@ var ApplicationConfiguration = (function() {
 angular.module(ApplicationConfiguration.applicationModuleName, ApplicationConfiguration.applicationModuleVendorDependencies);
 
 // Setting HTML5 Location Mode
-angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider',
-	function($locationProvider) {
+angular.module(ApplicationConfiguration.applicationModuleName).config(['$locationProvider', 'SpotifyProvider',
+	function($locationProvider, SpotifyProvider) {
 		$locationProvider.hashPrefix('!');
-	}
-]);
 
-// Setting Angular Material and Theme
-angular.module(ApplicationConfiguration.applicationModuleName).config(['$mdThemingProvider',
-	function($mdThemingProvider) {
-		$mdThemingProvider.theme('default')
-			.primaryPalette('green')
-			.accentPalette('lime')
+		SpotifyProvider.setClientId('7cb9a23e173e4c54987f4d90dd777509');
+		SpotifyProvider.setRedirectUri('http://localhost:3000/#!/spotify');
+		SpotifyProvider.setScope('user-read-private playlist-read-private playlist-modify-private playlist-modify-public');
+		// If you already have an auth token
+		//SpotifyProvider.setAuthToken('zoasliu1248sdfuiknuha7882iu4rnuwehifskmkiuwhjg23');
 	}
 ]);
 
@@ -71,6 +69,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 		state('home', {
 			url: '/',
 			templateUrl: 'modules/core/views/home.client.view.html'
+		}).
+		state('weather', {
+			url: '/weather',
+			templateUrl: 'modules/core/views/home.client.view.html'
 		});
 	}
 ]);
@@ -95,25 +97,91 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 'use strict';
 
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Transport',
-	function($scope, Authentication, Transport) {
-		// This provides Authentication context.
-		$scope.authentication = Authentication;
+angular.module('core').controller('HomeController', ['$scope', 'Transport', 'Weather', '$http', 'Spotify', 'Shopping',
+	function($scope, Transport, Weather, $http, Spotify, Shopping) {
 
 		var _this = this;
 
-		var transport = Transport.get({}, function() {
-			_this.transport1 = transport.connections[0].from.departure;
-			_this.transport2 = transport.connections[1].from.departure;
-		});
+		this.getList = function() {
+			//Spotify.login();
+			Spotify.getArtistTopTracks('1vCWHaC5f2uS3yhpwWbIA6', 'AU').then(function (data) {
+				console.log(data);
+				_this.tracks = data.tracks;
+			});
+			/*Spotify.getUserPlaylists('christianbueschi').then(function (data) {
+				console.log(data);
+			});*/
+		};
 
 
+		this.getTransportConnection = function() {
+			var transport = Transport.get({}, function() {
+				_this.transport1 = transport.connections[0].from.departure;
+				_this.transport2 = transport.connections[1].from.departure;
+			});
+			setTimeout(function() {
+				_this.getTransportConnection();
+			},1000*10); // every 10 seconds
+		};
 
+		this.submit = function() {
+			var shoppingItem = new Shopping ({
+				title: this.title
+			});
+			shoppingItem.$save(function(response) {
+				_this.title = '';
+				_this.getAllItems();
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
 
+		this.getAllItems = function() {
+			this.items = Shopping.query();
+		};
 
+		this.bought = function(item) {
+			item.$update(function() {
+				_this.getAllItems();
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
 
+		this.remove = function(item) {
+			item.$remove(function() {
+				_this.getAllItems();
+			}, function(errorResponse) {
+				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		this.getWeatherForecast = function() {
+			var forecast;
+			var setFirstCode = false;
+			var weather_code = 1; // default value
+
+			var weather = Weather.get({}, function() {
+				forecast = weather.forecast;
+				angular.forEach(forecast, function(day, date) {
+					if(!setFirstCode) {
+						weather_code = day.w;
+						if(weather_code>9) {
+							weather_code = weather_code/10;
+						}
+						weather_code = parseInt(weather_code);
+						setFirstCode = true;
+					}
+				});
+
+				_this.weather_code = weather_code;
+				_this.weather = weather.forecast;
+				setTimeout(function() {
+					_this.getWeatherForecast();
+				},1000*60*60); // every hour
+			});
+		};
 	}
-
 ]);
 'use strict';
 
@@ -283,6 +351,26 @@ angular.module('core').service('Menus', [
 ]);
 'use strict';
 
+angular.module('core').factory('Shopping', ['$resource',
+	function ($resource) {
+
+		var url = 'shopping/:shoppingId';
+
+		return $resource(url, { shoppingId: '@_id'
+		}, {
+			update: {
+				method: 'PUT'
+			}
+		});
+	}
+]);
+
+
+
+
+
+'use strict';
+
 //Teams service used to communicate Teams REST endpoints
 angular.module('core').factory('Transport', ['$resource', function($resource) {
 
@@ -296,6 +384,56 @@ angular.module('core').factory('Transport', ['$resource', function($resource) {
 
 
 
+'use strict';
+
+//Teams service used to communicate Teams REST endpoints
+angular.module('core').factory('Weather', ['$resource', function($resource) {
+
+	var url = '/weather';
+
+	return $resource(url);
+}
+]);
+
+
+
+
+
+'use strict';
+
+// Setting up route
+angular.module('spotify').config(['$stateProvider', '$urlRouterProvider',
+	function($stateProvider, $urlRouterProvider) {
+		// Redirect to home view when route not found
+		$urlRouterProvider.otherwise('/');
+
+		// Home state routing
+		$stateProvider.
+			state('spotify', {
+				url: '/spotify',
+				templateUrl: 'modules/spotify/views/spotify.client.view.html'
+			});
+	}
+]);
+/**
+ * Created by cbueschi on 27/04/15.
+ */
+'use strict';
+
+
+angular.module('spotify').controller('SpotifyController', ['$scope', 'Spotify',
+	function($scope, Spotify) {
+
+		var target = window.self === window.top ? window.opener : window.parent;
+		var hash = window.location.hash;
+		if (hash) {
+			var token = window.location.hash.split('&')[0].split('=')[1];
+			alert(token);
+			//target.postMessage(token, 'http://example.com/');
+			localStorage.setItem('spotify-token', token);
+		}
+	}
+]);
 'use strict';
 
 // Config HTTP Error Handling
